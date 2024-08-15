@@ -39,7 +39,7 @@ namespace test_back.Controllers
         [HttpPost]
         public async Task<ActionResult<Category>> CreateCategory(Category category)
         {
-            await CategoryService.CreateCategoryAsync(category);
+            await CategoryService.AddCategoryAsync(category);
             return CreatedAtAction(nameof(GetCategory), new { id = category.Id }, category);
         }
 

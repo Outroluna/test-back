@@ -1,17 +1,29 @@
-﻿namespace test_back.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+namespace test_back.Models
 {
     public class OrderItem
     {
-        ///Отдельная позиция в заказе: 
+        ///Инфо о каждом элементе заказа
         public int Id { get; set; }
-        public int Quantity { get; set; } //Количество заказанного товара
-        public decimal Price { get; set; } // Цена за единицу товара на момент заказа
 
+        [Required]
+        public int Quantity { get; set; } ///Количество заказанного товара
+        
+        [Required]
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal UnitPrice { get; set; }//// Цена за единицу товара
 
+        [Required]
         public int OrderId { get; set; }
-        public Order? Order { get; set; }
 
-        public int ProductId { get; set; }
-        public Product? Product { get; set; }
+        [ForeignKey("OrderId")]
+        public Order Order { get; set; }
+
+        [Required]
+        public int ProductId { get; set; }///Идентификатор товара который был заказан
+
+        [ForeignKey("ProductId")]
+        public Product Product { get; set; }
     }
 }

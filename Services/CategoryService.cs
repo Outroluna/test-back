@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using test_back.Data;
 using test_back.Models;
 
@@ -20,19 +22,20 @@ namespace test_back.Services
 
         public async Task<Category> GetCategoryByIdAsync(int id)
         {
-            return await Context.Categories.FindAsync(id);
+            return await Context.Categories.FirstOrDefaultAsync(c => c.Id == id);
         }
 
-        public async Task CreateCategoryAsync(Category category)
+        public async Task<Category> AddCategoryAsync(Category category)
         {
             Context.Categories.Add(category);
             await Context.SaveChangesAsync();
+            return category;
         }
-
-        public async Task UpdateCategoryAsync(Category category)
+        public async Task<Category> UpdateCategoryAsync(Category category)
         {
-            Context.Entry(category).State = EntityState.Modified;
+            Context.Categories.Update(category);
             await Context.SaveChangesAsync();
+            return category;
         }
 
         public async Task DeleteCategoryAsync(int id)
@@ -43,7 +46,7 @@ namespace test_back.Services
                 Context.Categories.Remove(category);
                 await Context.SaveChangesAsync();
             }
-        }
+        } ///if == nul -> false 
 
     }
 }

@@ -45,7 +45,7 @@ namespace test_back.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, User user)
         {
-            if (id != user.Id)
+            if (id != 0)
             {
                 return BadRequest();
             }

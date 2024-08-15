@@ -1,10 +1,12 @@
-﻿namespace test_back.Models
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace test_back.Models
 {
-    public class User
+    public class User: IdentityUser
     {
-        public int Id { get; set; }
-        public string? UserName { get; set; }
-        public string? Email { get; set; }
-        public string? Password { get; set; }
+        public string? Name { get; set; }
+
+        public string? Address { get; set; }
+        public override string? PhoneNumber { get; set; }
     }
 }

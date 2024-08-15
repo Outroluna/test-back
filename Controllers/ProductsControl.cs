@@ -9,7 +9,7 @@ using test_back.Services;
 
 namespace test_back.Controllers
 {
-    [Route("api/[Products]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class ProductsControl : ControllerBase
     {
