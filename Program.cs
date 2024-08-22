@@ -2,78 +2,25 @@ using Microsoft.AspNetCore.Authentication.Cookies;///пространство имен для работ
 using Microsoft.AspNetCore.Identity;///пространство имен для работы с системой управления пользователями (Identity)
 using Microsoft.EntityFrameworkCore;///пространство имен для работы с Entity Framework Core, ORM для взаимодействия с базой данных
 using test_back.Data;
-using test_back.Models;
+using test_back;
 using test_back.Services;
 
 var builder = WebApplication.CreateBuilder(args);///Создает объект builder, который используется для конфигурации и создания веб-приложения
-
-///Настройка контекста базы данных с использованием Entity Framework и PostgreSQL.
+builder.Services.AddRazorComponents();
+////Настройка контекста базы данных 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));///Регистрирует ApplicationDbContext для использования с PostgreSQL через Entity Framework
-
-///Настройка Identity для управления пользователями, ролями и аутентификацией.
-builder.Services.AddIdentity<User, IdentityRole>(options => ///Настраивает систему Identity для управления пользователями и ролями. Задает требования к паролям и другую информацию для аутентификации.
-{
-    options.Password.RequireDigit = true;
-    options.Password.RequiredLength = 6;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireLowercase = true;
-})
-    .AddEntityFrameworkStores<ApplicationDbContext>()///Настраивает Identity использовать ApplicationDbContext для хранения данных пользователей и ролей
-    .AddDefaultTokenProviders();///Добавляет поддержку токенов для двухфакторной аутентификации и восстановления пароля.
-
-///Настройка аутентификации с использованием куки-файлов.
-///Настраивает аутентификацию с использованием куки-файлов. Указывает пути для входа в систему и обработки ошибок доступа.
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/Account/Login";
-        options.AccessDeniedPath = "/Account/AccessDenied";
-    });
-
-// Регистрация CORS для взаимодействия с фронтендом
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(builder =>
-    {
-        builder.WithOrigins("https://localhost:5062") // URL вашего фронтенда Blazor WebAssembly
-               .AllowAnyHeader()
-               .AllowAnyMethod();
-    });
-});
-
-// Регистрация контроллеров
-builder.Services.AddControllersWithViews();
-
-///Регистрация сервисов для работы с бизнес-логикой.
+///Регистрация сервисов
 builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
-
-var app = builder.Build();///Создает экземпляр веб-приложения, используя все настройки, сделанные выше.
-
-// Используем CORS
-app.UseCors();
-
-// Используем статические файлы
-app.UseStaticFiles();
-
-// Настройка маршрутизации
-app.UseRouting();
-
-// Используем аутентификацию и авторизацию
-app.UseAuthentication();
-app.UseAuthorization();
-
-// Настройка маршрутов
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-app.MapRazorPages(); // Для использования страниц Razor, если они есть
-
-
+//builder.Services.AddScoped<ICategoryService, CategoryService>();
+//builder.Services.AddScoped<IOrderService, OrderService>();
+/////Configure Blazor WebAssembly
+//builder.Services.AddServerSideBlazor();
+var app = builder.Build();///Создает экземпляр веб-приложения, используя все настройки, сделанные выше
+app.UseAntiforgery();
+app.MapRazorComponents<App>();
+app.MapGet("/", () => "Hello World!");
+app.Run();
 
 
 

@@ -14,57 +14,57 @@ namespace test_back.Controllers
         {
             UserService = userService;
         }
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        // POST: api/User/Register
+        [HttpPost("Register")]
+        public async Task<IActionResult> Register(Register model)
         {
-            var users = await UserService.GetAllUsersAsync();
-            return Ok(users);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await UserService.RegisterUserAsync(model);
+            if (result)
+                return Ok(new { message = "User registered successfully" });
+
+            return BadRequest(new { message = "User registration failed" });
+        }
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login(Login model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await UserService.LoginUserAsync(model);
+            if (result)
+                return Ok(new { message = "User logged in successfully" });
+
+            return Unauthorized(new { message = "Invalid username or password" });
+        }
+        [HttpPost("Logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await UserService.LogoutUserAsync();
+            return Ok(new { message = "User logged out successfully" });
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        // GET: api/User/{userId}
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetUserById(string userId)
         {
-            var user = await UserService.GetUserByIdAsync(id);
-
+            var user = await UserService.GetUserByIdAsync(userId);
             if (user == null)
-            {
-                return NotFound();
-            }
+                return NotFound(new { message = "Пользователь не найден" });
 
             return Ok(user);
         }
-
-        [HttpPost]
-        public async Task<ActionResult<User>> CreateUser(User user)
+        [HttpGet("{userId}/Roles")]
+        public async Task<IActionResult> GetUserRoles(string userId)
         {
-            await UserService.CreateUserAsync(user);
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, User user)
-        {
-            if (id != 0)
-            {
-                return BadRequest();
-            }
-
-            await UserService.UpdateUserAsync(user);
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
-        {
-            var user = await UserService.GetUserByIdAsync(id);
+            var user = await UserService.GetUserByIdAsync(userId);
             if (user == null)
-            {
-                return NotFound();
-            }
+                return NotFound(new { message = "User not found" });
 
-            await UserService.DeleteUserAsync(id);
-            return NoContent();
+            var roles = await UserService.GetUserRolesAsync(user);
+            return Ok(roles);
         }
     }
 }
